@@ -6,10 +6,11 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
-if [[ -z "$ZUUL_IP" ]]; then
-    echo "The ZUUL_IP must be set."
-    exit 1
-fi
+#if [[ -z "$ZUUL_IP" ]]; then
+#    echo "The ZUUL_IP must be set."
+#    exit 1
+#fi
+ZUUL_IP=127.0.0.1
 
 cdir=$(cd $(dirname "$0") && pwd)
 
