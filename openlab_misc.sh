@@ -62,7 +62,7 @@ wget https://s3-us-west-2.amazonaws.com/grafana-releases/release/grafana_4.5.2_a
 sudo apt-get install -y adduser libfontconfig
 sudo dpkg -i grafana_4.5.2_amd64.deb
 cp $cdir/conf/grafana/* /etc/grafana/
-service grafana-server restart
+#service grafana-server restart
 
 # install statsd
 apt-get install git nodejs devscripts debhelper dh-systemd -y
@@ -76,8 +76,8 @@ cd ..
 cp $cdir/conf/statsd/* /etc/statsd/
 sudo service carbon-cache stop
 sudo dpkg -i statsd*.deb
-service carbon-cache start
-service statsd restart
+#service carbon-cache start
+#service statsd restart
 
 # Install zuul status
 cp $cdir/conf/zuul/zuul.conf /etc/apache2/sites-available/
@@ -88,10 +88,10 @@ mkdir -p /var/lib/zuul/www
 cp -r $cdir/zuul-repo/etc/status/public_html/* /var/lib/zuul/www/
 #htpasswd -cbB /etc/apache2/grafana_htpasswd openlab openlab
 
-sudo service carbon-cache stop
-service carbon-cache start
-service statsd restart
-service grafana-server restart
+#sudo service carbon-cache stop
+#service carbon-cache start
+#service statsd restart
+#service grafana-server restart
 
 # Configure apache security
 DEBIAN_FRONTEND=noninteractive apt-get install libapache2-mod-evasive libapache2-modsecurity -y
@@ -105,7 +105,7 @@ cp $cdir/conf/mod_evasive/evasive.conf /etc/apache/mods-available/
 apt-get install fail2ban -y
 cp $cdir/conf/fail2ban/jail.local /etc/fail2ban/jail.local
 cp $cdir/conf/fail2ban/apache-modsecurity.conf /etc/fail2ban/filter.d/
-service fail2ban restart
+#service fail2ban restart
 
 a2dissite 000-default
 a2ensite apache2-graphite
@@ -115,4 +115,4 @@ a2enmod proxy_http
 a2enmod ssl
 a2enmod xml2enc
 a2enmod rewrite
-service apache2 restart
+#service apache2 restart
