@@ -25,15 +25,15 @@ mkdir -p /srv/static/logs/
 chown zuul.zuul /srv/static/logs/ -R
 
 # Precondition
-apt update -y && apt upgrade -y
-apt install python python-pip python3 python3-pip default-jdk python-psycopg2 -y
+apt-get update -y && apt-get upgrade -y
+apt-get install git python python-pip python3 python3-pip default-jdk python-psycopg2 -y
 
 # Install apache2
 apt-get install apache2 -y
 apt-get install libapache2-mod-wsgi -y
 
 # Install graphite, carbon
-apt install mariadb-server mariadb-client python-pymysql -y
+apt-get install mariadb-server mariadb-client python-pymysql -y
 
 cat << EOF > /root/mysql_secure_installation.sql
 UPDATE mysql.user SET Password=PASSWORD('root') WHERE User='root';

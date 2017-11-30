@@ -7,6 +7,7 @@ FROM     ubuntu:16.04
 ENV DEBIAN_FRONTEND noninteractive
 ADD ./gearman_zookeeper.sh /root/gearman_zookeeper.sh
 ADD ./openlab_misc.sh /root/openlab_misc.sh
+ADD ./conf /root/conf
 
 RUN  chmod +x /root/gearman_zookeeper.sh &&\
      bash -x /root/gearman_zookeeper.sh  &&\
