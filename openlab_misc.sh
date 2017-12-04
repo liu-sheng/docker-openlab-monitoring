@@ -35,27 +35,28 @@ apt-get install libapache2-mod-wsgi -y
 # Install graphite, carbon
 apt-get install mariadb-server mariadb-client python-pymysql -y
 
-cat << EOF > /root/mysql_secure_installation.sql
-UPDATE mysql.user SET Password=PASSWORD('root') WHERE User='root';
-DELETE FROM mysql.user WHERE User='';
-DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
-DROP DATABASE IF EXISTS test;
-DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
-FLUSH PRIVILEGES;
-CREATE USER 'graphite'@'localhost' IDENTIFIED BY 'password';
-CREATE DATABASE IF NOT EXISTS graphite;
-GRANT ALL PRIVILEGES ON graphite.* TO 'graphite'@'localhost' IDENTIFIED BY 'password';
-FLUSH PRIVILEGES;
-EOF
-mysql -sfu root < mysql_secure_installation.sql
+#cat << EOF > /root/mysql_secure_installation.sql
+#UPDATE mysql.user SET Password=PASSWORD('root') WHERE User='root';
+#DELETE FROM mysql.user WHERE User='';
+#DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+#DROP DATABASE IF EXISTS test;
+#DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
+#FLUSH PRIVILEGES;
+#CREATE USER 'graphite'@'localhost' IDENTIFIED BY 'password';
+#CREATE DATABASE IF NOT EXISTS graphite;
+#GRANT ALL PRIVILEGES ON graphite.* TO 'graphite'@'localhost' IDENTIFIED BY 'password';
+#FLUSH PRIVILEGES;
+#EOF
+#mysql -sfu root < mysql_secure_installation.sql
 
 DEBIAN_FRONTEND=noninteractive apt-get install graphite-web graphite-carbon -y
 cp $cdir/conf/graphite/local_settings.py /etc/graphite/
 cp $cdir/conf/carbon/*.conf /etc/carbon/
 cp $cdir/conf/graphite/apache2-graphite.conf /etc/apache2/sites-available/
 cp $cdir/conf/apache2-common/ports.conf /etc/apache2/
-graphite-manage migrate auth
-graphite-manage syncdb --noinput
+sed -i 's/CARBON_CACHE_ENABLED=false/CARBON_CACHE_ENABLED=true/' /etc/default/graphite-carbon
+# graphite-manage migrate auth
+# graphite-manage syncdb --noinput
 
 # Install grafana
 cd ~
@@ -68,6 +69,7 @@ service grafana-server restart
 # install statsd
 apt-get install git nodejs devscripts debhelper dh-systemd -y
 apt-get install npm -f -y
+ln -s /usr/bin/nodejs /usr/bin/node
 mkdir ~/build
 cd ~/build
 git clone https://github.com/etsy/statsd.git
@@ -75,11 +77,11 @@ cd statsd
 dpkg-buildpackage
 cd ..
 mkdir -p /etc/statsd/
-cp $cdir/conf/statsd/* /etc/statsd/
+#cp $cdir/conf/statsd/* /etc/statsd/
 service carbon-cache stop
 dpkg -i statsd*.deb
-service carbon-cache start
-service statsd restart
+systemctl enable statsd
+#service carbon-cache start
 
 # Install zuul status
 cp $cdir/conf/zuul/zuul.conf /etc/apache2/sites-available/
@@ -102,7 +104,7 @@ sed -i 's/SecRuleEngine DetectionOnly/SecRuleEngine On/g' /etc/modsecurity/modse
 mkdir -p /var/log/mod_evasive
 a2enmod evasive
 a2enmod security2
-cp $cdir/conf/mod_evasive/evasive.conf /etc/apache/mods-available/
+cp $cdir/conf/mod_evasive/evasive.conf /etc/apache2/mods-available/
 
 apt-get install fail2ban -y
 cp $cdir/conf/fail2ban/jail.local /etc/fail2ban/jail.local
